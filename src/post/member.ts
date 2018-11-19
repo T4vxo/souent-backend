@@ -18,7 +18,10 @@ export default async (req: Request, res: Response) => {
     return;
   }
 
+  let targetEmail: string = req.body.email;
+
   let enterprisePublicId = req.params.enterpriseId;
+  console.log("enterprisePublicId: ", enterprisePublicId);
   let enterpriseId = await query(
     `SELECT id FROM enterprise WHERE public_id = ? LIMIT 1`,
     [ enterprisePublicId ],
@@ -35,7 +38,26 @@ export default async (req: Request, res: Response) => {
     }));
   }
 
-  let result = await query(
-    `UPDATE users SET enterprise_id = ? WHERE email = ?`
+  //  ID of enterprise of which this user already is in
+  let existingEnterpriseId = await query(
+    `SELECT enterprise_id FROM user WHERE email = ?`,
+    [ targetEmail ]
   );
+
+  if (existingEnterpriseId) {
+    return res.status(403).end(JSON.stringify({
+      result: 'error',
+      error: 'alreadyInEnterprise',
+      message: 'The user with the email ' + targetEmail + ' is already within an enterprise.'
+    }));
+  }
+
+  let result = await query(
+    `UPDATE user SET enterprise_id = ? WHERE email = ?`,
+    [ enterpriseId, targetEmail ]
+  );
+
+  res.status(201).end(JSON.stringify({
+    result: 'ok'
+  }))
 }

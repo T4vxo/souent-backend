@@ -41,67 +41,57 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var utils_1 = __importDefault(require("../utils"));
 var db_1 = require("../db");
-var uuid_1 = __importDefault(require("uuid"));
 var role_auth_1 = require("../auth/role_auth");
 /**
- * Creates a new enterprise.
+ * Adds a member to the enterprise.
  * @author Johan Svensson
  */
 exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, name, about, logoUri, validationError, publicId, insert;
+    var targetEmail, enterprisePublicId, enterpriseId, existingEnterpriseId, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, role_auth_1.requireRoleWithResponse('contributor', req, res)];
+            case 0: return [4 /*yield*/, role_auth_1.requireRoleWithResponse('member', req, res)];
             case 1:
                 if (!(_a.sent())) {
                     return [2 /*return*/];
                 }
                 if (!utils_1.default.assertParamsWithResponse([
-                    'name',
+                    'email',
                 ], req.body, res)) {
                     return [2 /*return*/];
                 }
-                body = req.body;
-                name = body.name;
-                about = body.about;
-                logoUri = 'i am logo boi';
-                validationError = validate(name, about);
-                if (validationError !== true) {
+                targetEmail = req.body.email;
+                enterprisePublicId = req.params.enterpriseId;
+                console.log("enterprisePublicId: ", enterprisePublicId);
+                return [4 /*yield*/, db_1.query("SELECT id FROM enterprise WHERE public_id = ? LIMIT 1", [enterprisePublicId], {
+                        forceArray: false,
+                        skipObjectIfSingleResult: true
+                    })];
+            case 2:
+                enterpriseId = _a.sent();
+                if (!enterpriseId) {
                     return [2 /*return*/, res.status(401).end(JSON.stringify({
                             result: 'error',
-                            error: 'validation',
-                            message: validationError
+                            error: 'invalidEnterprise'
                         }))];
                 }
-                _a.label = 2;
-            case 2:
-                publicId = uuid_1.default().substr(0, 36);
-                _a.label = 3;
-            case 3: return [4 /*yield*/, db_1.query("SELECT '1' FROM enterprise WHERE public_id = ?", [publicId], { forceArray: true })];
+                return [4 /*yield*/, db_1.query("SELECT enterprise_id FROM user WHERE email = ?", [targetEmail])];
+            case 3:
+                existingEnterpriseId = _a.sent();
+                if (existingEnterpriseId) {
+                    return [2 /*return*/, res.status(403).end(JSON.stringify({
+                            result: 'error',
+                            error: 'alreadyInEnterprise',
+                            message: 'The user with the email ' + targetEmail + ' is already within an enterprise.'
+                        }))];
+                }
+                return [4 /*yield*/, db_1.query("UPDATE user SET enterprise_id = ? WHERE email = ?", [enterpriseId, targetEmail])];
             case 4:
-                if ((_a.sent()).length > 0) return [3 /*break*/, 2];
-                _a.label = 5;
-            case 5: return [4 /*yield*/, db_1.query("INSERT INTO enterprise (name, description, logo, public_id) VALUES (?, ?, ?, ?)", [name, about, logoUri, publicId])];
-            case 6:
-                insert = _a.sent();
-                //  OK
-                res.end(JSON.stringify({
-                    result: 'ok',
-                    enterprise: {
-                        id: insert.insertId
-                    }
+                result = _a.sent();
+                res.status(201).end(JSON.stringify({
+                    result: 'ok'
                 }));
                 return [2 /*return*/];
         }
     });
 }); });
-/**
- * Validates an enterprise name.
- * @returns Validation error or true if passed.
- */
-function validate(name, description) {
-    if (!/(\w+){3,}/.test(name)) {
-        return "invalidName";
-    }
-    return true;
-}

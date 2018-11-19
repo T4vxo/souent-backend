@@ -36,6 +36,10 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
       let output: any = res;
 
       if (Array.isArray(output)) {
+        if (!opts.forceArray && res.length < 2) {
+          output = res[0];
+        }
+
         if (opts.skipObjectIfSingleResult) {
           output = res.map(e => {
             let keys = Object.keys(e);
@@ -46,10 +50,12 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
               return e;
             }
           });
-        }
 
-        if (!opts.forceArray && res.length < 2) {
-          output = res[0];
+          console.log("Output: ", output);
+
+          if (output.length == 1) {
+            output = output[0];
+          }
         }
       }
 
@@ -77,6 +83,7 @@ export function setupDb() {
         return process.exit(1);
       }
 
+      console.log("Connected to db!");
       return resolve(_db);
     });
   })

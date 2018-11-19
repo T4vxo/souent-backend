@@ -8,8 +8,8 @@ import { query } from "../db";
  * @returns Whether the validation succeeded.
  */
 export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contributor', req: Request, res: Response): Promise<boolean> {
-  let auth = req.header("Authorization").trim();
-  
+  let auth = (req.header("Authorization") || "").trim();
+
   if (auth.toLowerCase().indexOf("bearer ") != 0) {
     res.status(403).end(JSON.stringify({
       result: 'error',
@@ -20,7 +20,7 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
   }
 
   let oauthToken = auth.substr("bearer ".length);
-  let matchedUser = await getMemberWithToken(oauthToken, [ 'role', 'enterprise_id' ]);
+  let matchedUser = await getMemberWithToken(oauthToken, ['role', 'enterprise_id']);
 
   if (!matchedUser || !("role" in matchedUser)) {
     res.status(403).end(JSON.stringify({
@@ -46,10 +46,16 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
   if (role == "member") {
     let publicEnterpriseId = req.param("enterpriseId", "");
     let enterpriseId = await query(
-      "SELECT id FROM enterprises WHERE public_id = ?",
-      [ publicEnterpriseId ]
+      "SELECT id FROM enterprise WHERE public_id = ? LIMIT 1",
+      [publicEnterpriseId],
+      {
+        forceArray: false,
+        skipObjectIfSingleResult: true
+      }
     );
-   
+
+    console.log("enterprise id: ", enterpriseId, typeof enterpriseId, "matched user enterprise id: ", matchedUser.enterprise_id, typeof matchedUser.enterprise_id)
+
     if (matchedUser.enterprise_id != enterpriseId) {
       res.status(403).end(JSON.stringify({
         result: 'error',
@@ -65,7 +71,7 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
 
 async function getMemberWithToken(token: string, columns: string[]): Promise<any> {
   return query(
-    `SELECT ${columns.join(",")} FROM users WHERE secret = ?`,
-    [ token ]
+    `SELECT ${columns.join(",")} FROM user WHERE secret = ?`,
+    [token]
   );
 }

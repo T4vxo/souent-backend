@@ -78,6 +78,9 @@ exports.query = function (sql, args, opts) {
                 }
                 var output = res;
                 if (Array.isArray(output)) {
+                    if (!opts.forceArray && res.length < 2) {
+                        output = res[0];
+                    }
                     if (opts.skipObjectIfSingleResult) {
                         output = res.map(function (e) {
                             var keys = Object.keys(e);
@@ -88,9 +91,10 @@ exports.query = function (sql, args, opts) {
                                 return e;
                             }
                         });
-                    }
-                    if (!opts.forceArray && res.length < 2) {
-                        output = res[0];
+                        console.log("Output: ", output);
+                        if (output.length == 1) {
+                            output = output[0];
+                        }
                     }
                 }
                 return resolve(output);
@@ -118,6 +122,7 @@ function setupDb() {
                             reject();
                             return process.exit(1);
                         }
+                        console.log("Connected to db!");
                         return resolve(_db);
                     });
                     return [2 /*return*/];

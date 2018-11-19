@@ -34,74 +34,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = __importDefault(require("../utils"));
 var db_1 = require("../db");
-var uuid_1 = __importDefault(require("uuid"));
 var role_auth_1 = require("../auth/role_auth");
 /**
- * Creates a new enterprise.
+ * Revokes member access for an enterprise.
  * @author Johan Svensson
  */
 exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, name, about, logoUri, validationError, publicId, insert;
+    var params, targetEmail, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, role_auth_1.requireRoleWithResponse('contributor', req, res)];
+            case 0: return [4 /*yield*/, role_auth_1.requireRoleWithResponse('member', req, res)];
             case 1:
                 if (!(_a.sent())) {
                     return [2 /*return*/];
                 }
-                if (!utils_1.default.assertParamsWithResponse([
-                    'name',
-                ], req.body, res)) {
-                    return [2 /*return*/];
-                }
-                body = req.body;
-                name = body.name;
-                about = body.about;
-                logoUri = 'i am logo boi';
-                validationError = validate(name, about);
-                if (validationError !== true) {
-                    return [2 /*return*/, res.status(401).end(JSON.stringify({
-                            result: 'error',
-                            error: 'validation',
-                            message: validationError
-                        }))];
-                }
-                _a.label = 2;
+                params = req.params;
+                targetEmail = params.targetEmail;
+                return [4 /*yield*/, db_1.query("UPDATE user SET enterprise_id = NULL WHERE email = ?", [targetEmail])];
             case 2:
-                publicId = uuid_1.default().substr(0, 36);
-                _a.label = 3;
-            case 3: return [4 /*yield*/, db_1.query("SELECT '1' FROM enterprise WHERE public_id = ?", [publicId], { forceArray: true })];
-            case 4:
-                if ((_a.sent()).length > 0) return [3 /*break*/, 2];
-                _a.label = 5;
-            case 5: return [4 /*yield*/, db_1.query("INSERT INTO enterprise (name, description, logo, public_id) VALUES (?, ?, ?, ?)", [name, about, logoUri, publicId])];
-            case 6:
-                insert = _a.sent();
-                //  OK
-                res.end(JSON.stringify({
-                    result: 'ok',
-                    enterprise: {
-                        id: insert.insertId
-                    }
+                result = _a.sent();
+                res.status(200).end(JSON.stringify({
+                    result: 'ok'
                 }));
                 return [2 /*return*/];
         }
     });
 }); });
-/**
- * Validates an enterprise name.
- * @returns Validation error or true if passed.
- */
-function validate(name, description) {
-    if (!/(\w+){3,}/.test(name)) {
-        return "invalidName";
-    }
-    return true;
-}

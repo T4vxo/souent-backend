@@ -43,5 +43,5 @@ exports.default = {
             }));
             return false;
         }
-    }
+    },
 };

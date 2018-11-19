@@ -34,38 +34,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var db_1 = require("../db");
-var role_auth_1 = require("../auth/role_auth");
-var updateableColumns = [];
 /**
- * Updates an existing business model canvas card.
+ * Authorizes with oauth.
  * @author Johan Svensson
  */
-exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var params, enterpriseId, result;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, role_auth_1.requireRoleWithResponse('member', req, res)];
-            case 1:
-                if (!(_a.sent())) {
-                    return [2 /*return*/];
-                }
-                params = req.params;
-                enterpriseId = params.enterpriseId;
-                return [4 /*yield*/, db_1.query("UPDATE card SET content=\"why why\"\n      WHERE card.enterprise_id = (\n          SELECT id FROM enterprise WHERE public_id = ?\n      )", [enterpriseId])];
-            case 2:
-                result = _a.sent();
-                console.log("Result: ", result);
-                if (result.affectedRows == 0) {
-                    return [2 /*return*/, res.end(JSON.stringify({
-                            result: 'noChange'
-                        }))];
-                }
-                return [2 /*return*/, res.end(JSON.stringify({
-                        result: 'ok'
-                    }))];
-        }
+function authorize(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            next();
+            return [2 /*return*/];
+        });
     });
-}); });
+}
+exports.authorize = authorize;

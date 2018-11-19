@@ -15,7 +15,7 @@ export default async (req: Request, res: Response) => {
   let { targetEmail } = params;
 
   let result = await query(
-    `UPDATE users SET enterprise_id = NULL WHERE email = ?`,
+    `UPDATE user SET enterprise_id = NULL WHERE email = ?`,
     [ targetEmail ]
   );
 

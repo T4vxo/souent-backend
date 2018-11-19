@@ -2,7 +2,7 @@
  * Entrypoint for sount backend.
  */
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { setupDb } from './db';
 import fileUpload from 'express-fileupload';
 import { authorize } from './auth/oauth';
@@ -20,7 +20,14 @@ setupDb().then(() => {
     next();
   });
   app.use(express.json());
-  app.use(authorize)
+  app.use(authorize);
+  app.use((req, res, next) => {
+    try {
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
   
   const maxFileSize = 50 * 1024 * 1024;
   app.use(fileUpload({
@@ -37,7 +44,7 @@ setupDb().then(() => {
   app.get(`${basePath}/enterprises`, require('./get/enterprises').default);
   app.get(`${basePath}/enterprise/:enterpriseId/bmc/`, require('./get/bmc').default);
   app.post(`${basePath}/enterprises`, require('./post/enterprises').default);
-  app.put(`${basePath}/enterprise/:enterpriseId/member`, require('./post/member').default);
+  app.post(`${basePath}/enterprise/:enterpriseId/member`, require('./post/member').default);
   app.delete(`${basePath}/enterprise/:enterpriseId/member/:targetEmail`, require('./delete/member').default);
   app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, require('./put/bmc_card').default);
   app.delete(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, require('./put/bmc_card').default);

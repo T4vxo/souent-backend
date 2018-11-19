@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { query } from "../db";
+import { requireRoleWithResponse } from "../auth/role_auth";
 
 let updateableColumns = [
   
@@ -10,6 +11,10 @@ let updateableColumns = [
  * @author Johan Svensson
  */
 export default async (req: Request, res: Response) => {
+  if (!await requireRoleWithResponse('member', req, res)) {
+    return;
+  }
+
   let { params } = req;
 
   let enterpriseId: string = params.enterpriseId;

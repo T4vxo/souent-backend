@@ -2,12 +2,17 @@ import { Request, Response } from "express";
 import utils from "../utils";
 import { query } from "../db";
 import uuid from 'uuid';
+import { requireRoleWithResponse } from "../auth/role_auth";
 
 /**
  * Creates a new enterprise.
  * @author Johan Svensson
  */
 export default async (req: Request, res: Response) => {
+  if (!await requireRoleWithResponse('contributor', req, res)) {
+    return;
+  }
+  
   if (!utils.assertParamsWithResponse([
     'name',
   ], req.body, res)) {

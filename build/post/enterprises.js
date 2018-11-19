@@ -41,12 +41,13 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var utils_1 = __importDefault(require("../utils"));
 var db_1 = require("../db");
+var uuid_1 = __importDefault(require("uuid"));
 /**
  * Creates a new enterprise.
  * @author Johan Svensson
  */
 exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, name, about, logoUri, validationError, insert;
+    var body, name, about, logoUri, validationError, publicId, insert;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -57,8 +58,8 @@ exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0,
                 }
                 body = req.body;
                 name = body.name;
-                about = body.name;
-                logoUri = body.name;
+                about = body.about;
+                logoUri = 'i am logo boi';
                 validationError = validate(name, about);
                 if (validationError !== true) {
                     return [2 /*return*/, res.status(401).end(JSON.stringify({
@@ -67,8 +68,16 @@ exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0,
                             message: validationError
                         }))];
                 }
-                return [4 /*yield*/, db_1.query("INSERT INTO enterprise (name, description, logo) VALUES (?, ?, ?)", [name, about, logoUri])];
+                _a.label = 1;
             case 1:
+                publicId = uuid_1.default().substr(0, 36);
+                _a.label = 2;
+            case 2: return [4 /*yield*/, db_1.query("SELECT '1' FROM enterprise WHERE public_id=?", [publicId], { forceArray: true })];
+            case 3:
+                if ((_a.sent()).length > 0) return [3 /*break*/, 1];
+                _a.label = 4;
+            case 4: return [4 /*yield*/, db_1.query("INSERT INTO enterprise (name, description, logo, public_id) VALUES (?, ?, ?, ?)", [name, about, logoUri, publicId])];
+            case 5:
                 insert = _a.sent();
                 //  OK
                 res.end(JSON.stringify({
@@ -86,7 +95,7 @@ exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0,
  * @returns Validation error or true if passed.
  */
 function validate(name, description) {
-    if (!/(\w+{3,})/.test(name)) {
+    if (!/(\w+){3,}/.test(name)) {
         return "invalidName";
     }
     return true;

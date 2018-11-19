@@ -34,60 +34,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils_1 = __importDefault(require("../utils"));
 var db_1 = require("../db");
 /**
- * Creates a new enterprise.
+ * Updates an existing business model canvas card.
  * @author Johan Svensson
  */
 exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, name, about, logoUri, validationError, insert;
+    var params, enterpriseId, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!utils_1.default.assertParamsWithResponse([
-                    'name',
-                ], req.body, res)) {
-                    return [2 /*return*/];
-                }
-                body = req.body;
-                name = body.name;
-                about = body.name;
-                logoUri = body.name;
-                validationError = validate(name, about);
-                if (validationError !== true) {
-                    return [2 /*return*/, res.status(401).end(JSON.stringify({
-                            result: 'error',
-                            error: 'validation',
-                            message: validationError
+                params = req.params;
+                enterpriseId = params.enterpriseId;
+                return [4 /*yield*/, db_1.query("UPDATE card SET content=\"why why\"\n      WHERE card.enterprise_id = (\n          SELECT id FROM enterprise WHERE public_id = ?\n      )", [enterpriseId])];
+            case 1:
+                result = _a.sent();
+                console.log("Result: ", result);
+                if (result.affectedRows == 0) {
+                    return [2 /*return*/, res.end(JSON.stringify({
+                            result: 'noChange'
                         }))];
                 }
-                return [4 /*yield*/, db_1.query("INSERT INTO enterprise (name, description, logo) VALUES (?, ?, ?)", [name, about, logoUri])];
-            case 1:
-                insert = _a.sent();
-                //  OK
-                res.end(JSON.stringify({
-                    result: 'ok',
-                    enterprise: {
-                        id: insert.insertId
-                    }
-                }));
-                return [2 /*return*/];
+                return [2 /*return*/, res.end(JSON.stringify({
+                        result: 'ok'
+                    }))];
         }
     });
 }); });
-/**
- * Validates an enterprise name.
- * @returns Validation error or true if passed.
- */
-function validate(name, description) {
-    if (!/(\w+{3,})/.test(name)) {
-        return "invalidName";
-    }
-    return true;
-}

@@ -6,6 +6,7 @@ import express, { Request, Response } from 'express';
 import { setupDb } from './db';
 import fileUpload from 'express-fileupload';
 import { authorize } from './auth/oauth';
+import cors from 'cors';
 
 const config = {
   port: 8004
@@ -19,6 +20,9 @@ setupDb().then(() => {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     next();
   });
+  app.use(cors({
+    origin: 'http://localhost:8080'
+  }));
   app.use(express.json());
   app.use(authorize);
   app.use((req, res, next) => {

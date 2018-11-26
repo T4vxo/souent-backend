@@ -4,7 +4,7 @@ function assertParams(props: string[], obj: any, allowEmptyString = false) {
   let missingProps = [];
 
   for (let i of props) {
-    if (!obj.hasOwnProperty(i) || (allowEmptyString ? false : obj[i] == '')) {
+    if (!(i in obj) || (allowEmptyString ? false : obj[i] == '')) {
       missingProps.push(i);
     }
   }

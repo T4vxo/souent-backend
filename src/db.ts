@@ -1,6 +1,7 @@
 import mysql from 'mysql';
 import fs from 'fs';
 
+
 let _db: mysql.Connection;
 
 export const db = () => _db;
@@ -69,9 +70,13 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
 export function setupDb() {
   return new Promise(async (resolve, reject) => {
     console.log("Setting up db...");
+    let isWindows = process.platform == "win32"
+
     _db = await mysql.createConnection(
       {
-        ...JSON.parse(fs.readFileSync('/var/cred/souentcred').toString()),
+        ...JSON.parse(fs.readFileSync(
+          isWindows ? 'C:\\cred\\souentCred.json' : '/var/cred/souentcred'
+          ).toString()),
         charset: "utf8_general_ci"
       }
     );

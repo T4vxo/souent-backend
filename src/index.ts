@@ -48,4 +48,5 @@ setupDb().then(() => {
   app.delete(`${basePath}/enterprise/:enterpriseId/member/:targetEmail`, require('./delete/member').default);
   app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, require('./put/bmc_card').default);
   app.delete(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, require('./put/bmc_card').default);
+  app.post(`${basePath}/user/sign_up`, require('./post/sign_up').default)
 })

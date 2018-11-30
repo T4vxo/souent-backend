@@ -13,11 +13,11 @@ export default async (req: Request, res: Response) => {
   let { params } = req;
   let cards = await query(
     `SELECT
-        enterprise_id AS enterpriseId,
         content AS contentHtml,
         name,
         symbol as symbolFileUri
-      FROM bmc WHERE enterprise_id=?`,
+      FROM bmc
+        WHERE enterprise_public_id=?`,
     [params.enterpriseId],
     {
       forceArray: true,
@@ -25,12 +25,7 @@ export default async (req: Request, res: Response) => {
     }
   ) as BMCCard[];
 
-  cards = cards.map(e => {
-    delete e.enterpriseId;
-    return e;
-  });
-
   res.end(JSON.stringify({
-    cards
+    bmc: cards
   }));
 }

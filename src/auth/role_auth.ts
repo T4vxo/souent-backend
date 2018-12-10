@@ -71,7 +71,7 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
 
 async function getMemberWithToken(token: string, columns: string[]): Promise<any> {
   return query(
-    `SELECT ${columns.join(",")} FROM user WHERE secret = ?`,
+    `SELECT ${columns.join(",")} FROM user WHERE auth_token = ?`,
     [token]
   );
 }

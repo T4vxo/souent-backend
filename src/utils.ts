@@ -1,13 +1,15 @@
 import { Response } from "express";
 
-function assertParams(props: string[], obj: any, allowEmptyString = false) {
+function assertParams(props: string[], obj: any) {
   let missingProps = [];
 
   for (let i of props) {
-    if (!(i in obj) || (allowEmptyString ? false : obj[i] == '')) {
+    console.log(`${i} in obj: `, (i in obj));
+    if (!(i in obj)) {
       missingProps.push(i);
     }
   }
+  console.log("assertParams", props, obj, missingProps);
 
   if (missingProps.length > 0) {
     throw new Error("Missing parameters: " + missingProps.join(","));

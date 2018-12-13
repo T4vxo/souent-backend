@@ -7,12 +7,19 @@ import { setupDb } from './db';
 import fileUpload from 'express-fileupload';
 import { authorize } from './auth/oauth';
 import cors from 'cors';
+import { existsSync } from 'fs';
+import { authPath } from './services/email';
 
 const config = {
   port: 8004
 };
 
 let app: express.Application;
+
+if (!existsSync(authPath)) {
+  console.log(`Error: A file at the email auth path "${authPath}" does not exist!`);
+  process.exit(-1);
+}
 
 setupDb().then(() => {
   app = express();
@@ -21,7 +28,10 @@ setupDb().then(() => {
     next();
   });
   app.use(cors({
-    origin: 'http://localhost:8080'
+    origin: [
+      'http://localhost:8080',
+      'http://127.0.0.1:8080'
+    ]
   }));
   app.use(express.json());
   app.use(authorize);

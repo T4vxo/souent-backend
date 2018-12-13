@@ -7,17 +7,19 @@ import { query } from "../db";
  * @param insert Whether to allow inserting a member if the email does not exist.
  */
 export async function getMemberIdByEmail(email: string, insert = true) {
+  console.log("[getMemberIdByEmail] ", email);
   let match = await query(
-    `SELECT id FROM users WHERE email = ?`,
+    `SELECT id FROM user WHERE email = ?`,
     [email],
     {
-      forceArray: false,
+      forceArray: true,
       skipObjectIfSingleResult: true
     }
-  );
+  ) as any[];
+  console.log("[getMemberIdByEmail] match: ", match);
 
-  if (match) {
-    return match;
+  if (match.length) {
+    return match[0];
   } else if (!insert) {
     //  Not allowed to insert, stop here
     return -1;

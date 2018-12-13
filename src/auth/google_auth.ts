@@ -17,11 +17,11 @@ export async function verifyToken(token) {
       audience: CLIENT_ID,
     })
     const payload = ticket.getPayload();
-    const userId = payload['sub']
     const userEmail = payload['email']
 
+    console.log("veryifyToken payload: ", payload);
+
     return {
-      userId,
       userEmail
     }
   } catch (error) {

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import utils from "../utils";
 import { verifyToken } from "../auth/google_auth";
 import { query } from "../db";
+import { generateTokenForUser } from "../auth/auth_token";
 
 /**
  * @author Daniel Grigore
@@ -10,6 +11,7 @@ import { query } from "../db";
 export default async function (req: Request, res: Response) {
   console.log("bodfy:", req.body);
 
+  //  Require a valid Google access token
   if (!utils.assertParamsWithResponse([
     'accessToken'
   ], req.body, res)) {
@@ -27,16 +29,32 @@ export default async function (req: Request, res: Response) {
     forceArray: true
   }) as any[]
 
+  let userId: any;
+
   if (result.length == 0) {
-    await signUp(user)
+    userId = (await signUp({
+      email: user.userEmail
+    })).userId;
+  } else {
+    userId = result[0].id;
   }
 
+  let authToken = await generateTokenForUser(userId);
+
   res.end(JSON.stringify({
-    message_token: 'token ' + accessToken,
+    authToken
   }))
 
 }
 
-async function signUp(user) {
-  await query("INSERT INTO user (email, secret) VALUES (?, ?)", [user.userEmail, user.userId])
+/**
+ * Inserts a new user into the db.
+ * @param user 
+ */
+async function signUp(user: { email: string }) {
+  let insert = await query("INSERT INTO user (email) VALUES (?)", [user.email]) as any
+
+  return {
+    userId: insert.insertId
+  }
 }

@@ -19,8 +19,8 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
     return false;
   }
 
-  let oauthToken = auth.substr("bearer ".length);
-  let matchedUser = await getMemberWithToken(oauthToken, ['role', 'enterprise_id']);
+  let authToken = auth.substr("bearer ".length);
+  let matchedUser = await getMemberWithToken(authToken, ['role', 'enterprise_id']);
 
   if (!matchedUser || !("role" in matchedUser)) {
     res.status(403).end(JSON.stringify({

@@ -11,11 +11,11 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
   let auth = (req.header("Authorization") || "").trim();
 
   if (auth.toLowerCase().indexOf("bearer ") != 0) {
-    res.status(403).end(JSON.stringify({
+    res.status(403).json({
       result: 'error',
       error: 'forbidden',
       message: 'Missing Bearer header.'
-    }));
+    });
     return false;
   }
 
@@ -23,21 +23,21 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
   let matchedUser = await getMemberWithToken(authToken, ['role', 'enterprise_id']);
 
   if (!matchedUser || !("role" in matchedUser)) {
-    res.status(403).end(JSON.stringify({
+    res.status(403).json({
       result: 'error',
       error: 'forbidden',
       message: 'Invalid token or without role.'
-    }));
+    });
     return false;
   }
 
   if (role == "admin") {
     if (matchedUser.role != "admin") {
-      res.status(403).end(JSON.stringify({
+      res.status(403).json({
         result: 'error',
         error: 'forbidden',
         message: 'Admin permission required.'
-      }));
+      });
       return false;
     }
     return true;
@@ -57,11 +57,11 @@ export async function requireRoleWithResponse(role: 'admin' | 'member' | 'contri
     console.log("enterprise id: ", enterpriseId, typeof enterpriseId, "matched user enterprise id: ", matchedUser.enterprise_id, typeof matchedUser.enterprise_id)
 
     if (matchedUser.enterprise_id != enterpriseId) {
-      res.status(403).end(JSON.stringify({
+      res.status(403).json({
         result: 'error',
         error: 'forbidden',
         message: 'Denied from the enterprise with ID: ' + publicEnterpriseId + '.'
-      }));
+      });
       return false;
     }
   }

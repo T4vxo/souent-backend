@@ -44,10 +44,10 @@ export default async (req: Request, res: Response) => {
   }
   let columnsToUpdateKeys = Object.keys(columnsToUpdate);
   if (!columnsToUpdateKeys.length) {
-    return res.status(400).end(JSON.stringify({
+    return res.status(400).json({
       result: 'error',
       error: 'noUpdate'
-    }));
+    });
   }
 
   let enterpriseId: string = params.enterpriseId;
@@ -68,12 +68,12 @@ export default async (req: Request, res: Response) => {
   console.log("Result: ", result);
 
   if (result.affectedRows == 0) {
-    return res.end(JSON.stringify({
+    return res.json({
       result: 'noChange'
-    }))
+    });
   }
 
-  return res.end(JSON.stringify({
+  return res.json({
     result: 'ok'
-  }))
+  });
 }

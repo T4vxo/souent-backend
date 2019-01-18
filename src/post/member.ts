@@ -32,10 +32,10 @@ export default async (req: Request, res: Response) => {
   );
 
   if (!enterpriseId) {
-    return res.status(401).end(JSON.stringify({
+    return res.status(401).json({
       result: 'error',
       error: 'invalidEnterprise'
-    }));
+    });
   }
 
   //  ID of enterprise of which this user already is in
@@ -45,11 +45,11 @@ export default async (req: Request, res: Response) => {
   );
 
   if (existingEnterpriseId) {
-    return res.status(403).end(JSON.stringify({
+    return res.status(403).json({
       result: 'error',
       error: 'alreadyInEnterprise',
       message: 'The user with the email ' + targetEmail + ' is already within an enterprise.'
-    }));
+    });
   }
 
   let result = await query(
@@ -57,7 +57,7 @@ export default async (req: Request, res: Response) => {
     [ enterpriseId, targetEmail ]
   );
 
-  res.status(201).end(JSON.stringify({
+  res.status(201).json({
     result: 'ok'
-  }))
+  });
 }

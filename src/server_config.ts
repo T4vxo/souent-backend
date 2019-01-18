@@ -3,9 +3,10 @@
  */
 ;
 
+export const devPort = 8004;
 /**
  * Without trailing slash.
  */
-export const fqdn = "locahost:8080";
+export const fqdn = `locahost:${devPort}`;
 export const protocol = `http`;
 export const baseUrl = `${protocol}://${fqdn}`

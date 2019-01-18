@@ -22,7 +22,7 @@ export default async function (req: Request, res: Response) {
 
   let user = await verifyToken(accessToken);
   if (user == null) {
-    return res.status(400).end(JSON.stringify({ result: "error", error: 'invalid accesstoken' }))
+    return res.status(400).json({ result: "error", error: 'invalid accesstoken' });
   }
 
   let result: any[] = await query('SELECT id FROM user WHERE email = ?', user.userEmail, {
@@ -41,10 +41,9 @@ export default async function (req: Request, res: Response) {
 
   let authToken = await generateTokenForUser(userId);
 
-  res.end(JSON.stringify({
+  res.json({
     authToken
-  }))
-
+  });
 }
 
 /**

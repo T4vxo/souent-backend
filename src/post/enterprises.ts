@@ -30,6 +30,17 @@ export default async (req: Request, res: Response) => {
   let { body } = req;
   let name: string = body.name;
   let businessIdea: string = body.businessIdea;
+
+  if ("member-count" in body) {
+    //  Uses form data, convert to members array
+    body.additionalMembers = [];
+    for (let i = 0, n = parseInt(body['member-count']); i < n; i++) {
+      body.additionalMembers.push(
+        body[`member-${i}`]
+      );
+    }
+  }
+
   let additionalMembers: MemberData[] = (body.additionalMembers as string[]).map(email => {
     return {
       email
@@ -37,22 +48,22 @@ export default async (req: Request, res: Response) => {
   });
 
   if (!Array.isArray(additionalMembers)) {
-    return res.status(400).end(JSON.stringify({
+    return res.status(400).json({
       result: 'error',
       error: 'validation',
       message: 'additionalMembers must be an array of type MemberData'
-    }))
+    });
   }
 
   let logoUri: string = 'i am logo boi';
 
   let validationError = validate(name, businessIdea);
   if (validationError !== true) {
-    return res.status(400).end(JSON.stringify({
+    return res.status(400).json({
       result: 'error',
       error: 'validation',
       message: validationError
-    }))
+    });
   }
 
   let publicId = await generateUniquePublicId();
@@ -75,13 +86,12 @@ export default async (req: Request, res: Response) => {
   await insertBMCCards(enterpriseId);
 
   //  OK
-  res.end(JSON.stringify({
+  res.json({
     result: 'ok',
     enterprise: {
-      id: enterpriseId,
-      publicId
+      id: publicId
     }
-  }))
+  });
 }
 
 /**

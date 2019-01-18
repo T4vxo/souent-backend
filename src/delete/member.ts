@@ -19,7 +19,7 @@ export default async (req: Request, res: Response) => {
     [ targetEmail ]
   );
 
-  res.status(200).end(JSON.stringify({
+  res.status(200).json({
     result: 'ok'
-  }))
+  });
 }

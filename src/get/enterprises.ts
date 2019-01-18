@@ -23,7 +23,7 @@ export default async (req: Request, res: Response) => {
     return e;
   });
 
-  res.end(JSON.stringify({
+  res.json({
     enterprises
-  }));
+  });
 }

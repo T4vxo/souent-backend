@@ -14,8 +14,7 @@ export default async (req: Request, res: Response) => {
   let cards = await query(
     `SELECT
         content AS contentHtml,
-        name,
-        symbol as symbolFileUri
+        name
       FROM bmc
         WHERE enterprise_public_id=?`,
     [params.enterpriseId],
@@ -25,7 +24,7 @@ export default async (req: Request, res: Response) => {
     }
   ) as BMCCard[];
 
-  res.end(JSON.stringify({
+  res.json({
     bmc: cards
-  }));
+  });
 }

@@ -39,11 +39,11 @@ export default {
       assertParams(props, obj);
       return true;
     } catch (e) {
-      res.status(400).end(JSON.stringify({
+      res.status(400).json({
         status: 'error',
         error: 'missingParams',
         message: (e as Error).message
-      }))
+      });
       return false;
     }
   },

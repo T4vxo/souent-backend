@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"tsc -w\" \"nodemon\""
   },
   "_moduleAliases": {
     "src": "./build"
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/jojjesv/souent-backend#readme",
   "dependencies": {
+    "concurrently": "^4.1.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "google-auth-library": "^2.0.1",

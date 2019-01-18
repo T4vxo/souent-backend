@@ -2,6 +2,7 @@ import { Request } from "express";
 import { Response } from "express-serve-static-core";
 import Enterprise from "../models/Enterprise";
 import { query } from "../db";
+import { mediaBaseUrl } from "../server_config";
 
 /**
  * Outputs all enterprises.
@@ -10,18 +11,18 @@ import { query } from "../db";
 
 export default async (req: Request, res: Response) => {
   let enterprises = await query(
-    `SELECT * FROM enterprise`,
+    `SELECT
+      name,
+      description AS about,
+      public_id AS id,
+      CONCAT('${mediaBaseUrl}', logo) AS logoUri
+      FROM enterprise`,
     null,
     {
       forceArray: true,
       skipObjectIfSingleResult: false
     }
   ) as Enterprise[];
-
-  enterprises = enterprises.map(e => {
-    e.id = parseInt(e.id as any);
-    return e;
-  });
 
   res.json({
     enterprises

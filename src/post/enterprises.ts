@@ -43,7 +43,8 @@ export default async (req: Request, res: Response) => {
     });
   }
 
-  let logoUri: string = 'i am logo boi';
+  let logoFile = req.file;
+  let logoUri: string = logoFile.filename;
 
   let validationError = validate(name, businessIdea);
   if (validationError !== true) {

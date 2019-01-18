@@ -21,37 +21,25 @@ export default async (req: Request, res: Response) => {
 
   if (!utils.assertParamsWithResponse([
     'name',
-    'businessIdea',
-    'additionalMembers',
+    'business-idea',
+    'additional-member-count',
   ], req.body, res)) {
     return;
   }
 
   let { body } = req;
   let name: string = body.name;
-  let businessIdea: string = body.businessIdea;
+  let businessIdea: string = body["business-idea"];
 
-  if ("member-count" in body) {
-    //  Uses form data, convert to members array
-    body.additionalMembers = [];
-    for (let i = 0, n = parseInt(body['member-count']); i < n; i++) {
-      body.additionalMembers.push(
-        body[`member-${i}`]
-      );
-    }
-  }
+  /**
+   * Email addresses of additional members.
+   */
+  let additionalMembers: { email: string }[] = [];
 
-  let additionalMembers: MemberData[] = (body.additionalMembers as string[]).map(email => {
-    return {
-      email
-    }
-  });
-
-  if (!Array.isArray(additionalMembers)) {
-    return res.status(400).json({
-      result: 'error',
-      error: 'validation',
-      message: 'additionalMembers must be an array of type MemberData'
+  //  Assign members
+  for (let i = 0, n = parseInt(req.body["additional-member-count"]); i < n; i++) {
+    additionalMembers.push({
+      email: body[`member-${i}`]
     });
   }
 

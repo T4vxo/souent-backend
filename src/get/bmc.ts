@@ -30,7 +30,7 @@ export default async (req: Request, res: Response) => {
     `SELECT
       name
       FROM enterprise
-        WHERE id = ?`,
+        WHERE public_id = ?`,
     [enterpriseId],
     { forceArray: false, skipObjectIfSingleResult: false }
   ) as any || {};

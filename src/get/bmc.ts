@@ -3,6 +3,7 @@ import { Response } from "express-serve-static-core";
 import Enterprise from "../models/Enterprise";
 import { query } from "../db";
 import BMCCard from "../models/BMCCard";
+import { mediaBaseUrl } from "../server_config";
 
 /**
  * Outputs business model canvas data for an enterprise.
@@ -28,7 +29,9 @@ export default async (req: Request, res: Response) => {
 
   let enterprise = await query(
     `SELECT
-      name
+      name,
+      description AS businessIdea,
+      CONCAT('${mediaBaseUrl}/', logo) AS logoUrl
       FROM enterprise
         WHERE public_id = ?`,
     [enterpriseId],

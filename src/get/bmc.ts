@@ -26,8 +26,19 @@ export default async (req: Request, res: Response) => {
     }
   ) as BMCCard[];
 
+  let enterprise = await query(
+    `SELECT
+      name
+      FROM enterprise
+        WHERE id = ?`,
+    [enterpriseId],
+    { forceArray: false, skipObjectIfSingleResult: false }
+  ) as any || {};
+
+  enterprise.id = enterpriseId
+
   res.json({
-    enterpriseId,
+    enterprise,
     bmc: cards
   });
 }

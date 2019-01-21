@@ -11,10 +11,12 @@ import BMCCard from "../models/BMCCard";
 
 export default async (req: Request, res: Response) => {
   let { params } = req;
+  let { enterpriseId } = params;
   let cards = await query(
     `SELECT
+        card_id AS id,
         content AS contentHtml,
-        name
+        name AS title
       FROM bmc
         WHERE enterprise_public_id=?`,
     [params.enterpriseId],
@@ -25,6 +27,7 @@ export default async (req: Request, res: Response) => {
   ) as BMCCard[];
 
   res.json({
+    enterpriseId,
     bmc: cards
   });
 }

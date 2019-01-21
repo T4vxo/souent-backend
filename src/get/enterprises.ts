@@ -15,7 +15,7 @@ export default async (req: Request, res: Response) => {
       name,
       description AS businessIdea,
       public_id AS id,
-      CONCAT('${mediaBaseUrl}', logo) AS logoUrl
+      CONCAT('${mediaBaseUrl}/', logo) AS logoUrl
       FROM enterprise`,
     null,
     {

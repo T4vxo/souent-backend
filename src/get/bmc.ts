@@ -30,6 +30,7 @@ export default async (req: Request, res: Response) => {
   let enterprise = await query(
     `SELECT
       name,
+      description AS businessIdea,
       CONCAT('${mediaBaseUrl}/', logo) AS logoUrl
       FROM enterprise
         WHERE public_id = ?`,

@@ -13,9 +13,9 @@ export default async (req: Request, res: Response) => {
   let enterprises = await query(
     `SELECT
       name,
-      description AS about,
+      description AS businessIdea,
       public_id AS id,
-      CONCAT('${mediaBaseUrl}', logo) AS logoUri
+      CONCAT('${mediaBaseUrl}', logo) AS logoUrl
       FROM enterprise`,
     null,
     {

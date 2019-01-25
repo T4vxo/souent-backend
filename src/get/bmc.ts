@@ -16,7 +16,8 @@ export default async (req: Request, res: Response) => {
   let cards = await query(
     `SELECT
         card_id AS id,
-        content AS contentHtml,
+        content AS htmlContent,
+        content AS htmlPreviewContent,
         name AS title
       FROM bmc
         WHERE enterprise_public_id=?`,

@@ -44,26 +44,52 @@ export default async (req: Request, res: Response) => {
   }
   let columnsToUpdateKeys = Object.keys(columnsToUpdate);
   if (!columnsToUpdateKeys.length) {
-    return res.status(400).json({
-      result: 'error',
-      error: 'noUpdate'
+    return res.status(200).json({
+      result: 'noUpdate'
     });
   }
 
   let enterpriseId: string = params.enterpriseId;
   let cardId: string = params.cardId;
 
-  let result = await query(
-    `UPDATE card SET
-      ${columnsToUpdateKeys.map(col => `${col}=?`)}
-      JOIN enterprise ON enterprise.id = card.enterprise_id
-      WHERE card.id = ? AND enterprise.public_id = ?`,
-    [
+  console.log("SQL: ", `UPDATE card SET
+  ${columnsToUpdateKeys.map(col => `${col} = ?`).join(',')}
+  JOIN enterprise ON enterprise.id = card.enterprise_id
+  WHERE card.id = ? AND enterprise.public_id = ?`, 'with values:', [
       ...(columnsToUpdateKeys.map(col => columnsToUpdate[col])),
       cardId,
       enterpriseId
-    ]
-  ) as any;
+    ])
+
+  let result: any;
+  let enterpriseNumericId = await query(
+    `SELECT id FROM enterprise WHERE public_id = ?`,
+    [enterpriseId],
+    {
+      forceArray: false,
+      skipObjectIfSingleResult: true
+    }
+  )
+
+  if (enterpriseNumericId) {
+
+    result = await query(
+      `UPDATE card SET
+        ${columnsToUpdateKeys.map(col => `${col} = ?`).join(',')}
+        WHERE card.id = ? AND card.enterprise_id = ?`,
+      [
+        ...(columnsToUpdateKeys.map(col => columnsToUpdate[col])),
+        cardId,
+        enterpriseNumericId
+      ]
+    ) as any;
+
+  } else {
+    //  Simulate a no-update
+    result = {
+      affectedRows: 0
+    }
+  }
 
   console.log("Result: ", result);
 

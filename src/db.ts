@@ -89,7 +89,17 @@ export function setupDb() {
       }
 
       console.log("Connected to db!");
+      initDbHeartbeat();
       return resolve(_db);
     });
   })
 };
+
+/**
+ * Keeps the connection open to the db.
+ */
+function initDbHeartbeat() {
+  setInterval(() => {
+    query('SELECT 1')
+  }, 15e3)
+}

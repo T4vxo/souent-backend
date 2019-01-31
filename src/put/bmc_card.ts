@@ -51,16 +51,6 @@ export default async (req: Request, res: Response) => {
 
   let enterpriseId: string = params.enterpriseId;
   let cardId: string = params.cardId;
-
-  console.log("SQL: ", `UPDATE card SET
-  ${columnsToUpdateKeys.map(col => `${col} = ?`).join(',')}
-  JOIN enterprise ON enterprise.id = card.enterprise_id
-  WHERE card.id = ? AND enterprise.public_id = ?`, 'with values:', [
-      ...(columnsToUpdateKeys.map(col => columnsToUpdate[col])),
-      cardId,
-      enterpriseId
-    ])
-
   let result: any;
   let enterpriseNumericId = await query(
     `SELECT id FROM enterprise WHERE public_id = ?`,
@@ -75,6 +65,7 @@ export default async (req: Request, res: Response) => {
 
     result = await query(
       `UPDATE card SET
+        last_edit = NOW(),
         ${columnsToUpdateKeys.map(col => `${col} = ?`).join(',')}
         WHERE card.id = ? AND card.enterprise_id = ?`,
       [

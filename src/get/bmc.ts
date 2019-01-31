@@ -4,6 +4,7 @@ import Enterprise from "../models/Enterprise";
 import { query } from "../db";
 import BMCCard from "../models/BMCCard";
 import { mediaBaseUrl } from "../server_config";
+import { requireRole } from "../auth/role_auth";
 
 /**
  * Outputs business model canvas data for an enterprise.
@@ -18,7 +19,8 @@ export default async (req: Request, res: Response) => {
         card_id AS id,
         content AS htmlContent,
         content AS htmlPreviewContent,
-        name AS title
+        name AS title,
+        last_edit AS lastEdit
       FROM bmc
         WHERE enterprise_public_id=?`,
     [params.enterpriseId],
@@ -41,8 +43,23 @@ export default async (req: Request, res: Response) => {
 
   enterprise.id = enterpriseId
 
+  let members = await query(
+    `SELECT user.email FROM user
+      JOIN enterprise ON enterprise.public_id = ?
+      WHERE enterprise_id = enterprise.id`,
+    [enterpriseId],
+    {
+      forceArray: true,
+      skipObjectIfSingleResult: false
+    }
+  )
+
+  let permissions = await requireRole(req, 'contributor', enterpriseId)
+
   res.json({
     enterprise,
-    bmc: cards
+    bmc: cards,
+    members,
+    editable: permissions == 'granted'
   });
 }

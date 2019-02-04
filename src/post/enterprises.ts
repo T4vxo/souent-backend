@@ -7,16 +7,13 @@ import MemberData from "../models/MemberData";
 import { baseUrl } from "../server_config";
 import email from "../services/email";
 import { getMemberIdByEmail } from "../auth/users";
+import cardDefaultValues from "./card_default_values";
 
 /**
  * Creates a new enterprise.
  * @author Johan Svensson
  */
 export default async (req: Request, res: Response) => {
-  if (!await requireRoleWithResponse('contributor', req, res)) {
-    return;
-  }
-
   console.log("body: ", req.body, "additionalMembers" in req.body);
 
   if (!utils.assertParamsWithResponse([
@@ -157,12 +154,17 @@ async function insertBMCCards(enterpriseId: any) {
 
   let insertGroups: string[] = [];
   for (let i = 0; i < cardCount; i++) {
-    insertGroups.push(`(${i + 1}, ?)`);
+    insertGroups.push(`(${i + 1}, ?, ?)`);
   }
 
+  let sqlValues = []
+  insertGroups.forEach((_, i) => {
+    sqlValues.push(enterpriseId, cardDefaultValues[i])
+  })
+
   await query(
-    `INSERT INTO card (name_id, enterprise_id) VALUES ` +
+    `INSERT INTO card (name_id, enterprise_id, content) VALUES ` +
     insertGroups.join(","),
-    insertGroups.map(() => enterpriseId)
+    insertGroups
   );
 }

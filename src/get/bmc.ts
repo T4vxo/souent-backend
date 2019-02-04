@@ -20,7 +20,8 @@ export default async (req: Request, res: Response) => {
         content AS htmlContent,
         content AS htmlPreviewContent,
         name AS title,
-        last_edit AS lastEdit
+        last_edit AS lastEdit,
+        CONCAT('${mediaBaseUrl}/', image_uri) AS imageSrc
       FROM bmc
         WHERE enterprise_public_id=?`,
     [params.enterpriseId],

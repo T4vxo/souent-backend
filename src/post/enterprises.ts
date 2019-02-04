@@ -165,6 +165,6 @@ async function insertBMCCards(enterpriseId: any) {
   await query(
     `INSERT INTO card (name_id, enterprise_id, content) VALUES ` +
     insertGroups.join(","),
-    insertGroups
+    sqlValues
   );
 }

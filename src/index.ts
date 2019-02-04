@@ -34,6 +34,7 @@ setupDb().then(() => {
   });
   app.use(cors({
     origin: [
+      'http://localhost:8080',
       'http://localhost:8081',
       'http://127.0.0.1:8081'
     ]
@@ -47,8 +48,7 @@ setupDb().then(() => {
       next(e);
     }
   });
-  
-  const maxFileSize = 50 * 1024 * 1024;
+
 
   app.listen(config.port, () => {
     console.log("App listening on port :" + config.port);

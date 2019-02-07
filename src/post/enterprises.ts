@@ -8,12 +8,13 @@ import { baseUrl } from "../server_config";
 import email from "../services/email";
 import { getMemberIdByEmail } from "../auth/users";
 import cardDefaultValues from "./card_default_values";
+import AuthRequest from "../models/AuthRequest";
 
 /**
  * Creates a new enterprise.
  * @author Johan Svensson
  */
-export default async (req: Request, res: Response) => {
+export default async (req: AuthRequest, res: Response) => {
   console.log("body: ", req.body, "additionalMembers" in req.body);
 
   if (!utils.assertParamsWithResponse([
@@ -60,6 +61,14 @@ export default async (req: Request, res: Response) => {
   ) as any;
 
   let enterpriseId = insert.insertId;
+
+  //  Set enterprise ID for current user
+  await query(
+    `UPDATE user
+      SET enterprise_id = ?
+        WHERE id = ?`,
+    [enterpriseId, req.user.id]
+  )
 
   if (additionalMembers.length) {
     await addMembers(additionalMembers, enterpriseId);

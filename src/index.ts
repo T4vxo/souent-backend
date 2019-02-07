@@ -5,7 +5,7 @@
 import express, { Request, Response } from 'express';
 import { setupDb } from './db';
 import multer from 'multer';
-import { authorize } from './auth/oauth';
+import { authorize } from './auth/auth';
 import cors from 'cors';
 import { existsSync } from 'fs';
 import { authPath } from './services/email';
@@ -40,7 +40,6 @@ setupDb().then(() => {
     ]
   }));
   app.use(express.json());
-  app.use(authorize);
   app.use((req, res, next) => {
     try {
       next();
@@ -59,12 +58,12 @@ setupDb().then(() => {
   }));
 
   const basePath = '/api';
-  app.get(`${basePath}/enterprises`, require('./get/enterprises').default);
-  app.get(`${basePath}/enterprise/:enterpriseId/bmc/`, require('./get/bmc').default);
-  app.post(`${basePath}/enterprises`, formDataHandler.single('logo'), require('./post/enterprises').default);
-  app.post(`${basePath}/enterprise/:enterpriseId/member`, require('./post/member').default);
-  app.delete(`${basePath}/enterprise/:enterpriseId/member/:targetEmail`, require('./delete/member').default);
-  app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, require('./put/bmc_card').default);
-  app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId/cover`, formDataHandler.single('image'), require('./put/bmc_card_cover_image').default);
+  app.get(`${basePath}/enterprises`, authorize, require('./get/enterprises').default);
+  app.get(`${basePath}/enterprise/:enterpriseId/bmc/`, authorize, require('./get/bmc').default);
+  app.post(`${basePath}/enterprises`, authorize, formDataHandler.single('logo'), require('./post/enterprises').default);
+  app.post(`${basePath}/enterprise/:enterpriseId/member`, authorize, require('./post/member').default);
+  app.delete(`${basePath}/enterprise/:enterpriseId/member/:targetEmail`, authorize, require('./delete/member').default);
+  app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId`, authorize, require('./put/bmc_card').default);
+  app.put(`${basePath}/enterprises/:enterpriseId/bmc/:cardId/cover`, authorize, formDataHandler.single('image'), require('./put/bmc_card_cover_image').default);
   app.post(`${basePath}/user/auth`, require('./post/auth').default)
 })

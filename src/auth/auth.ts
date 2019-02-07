@@ -41,6 +41,6 @@ export async function authorize(req: AuthRequest, res: Response, next: NextFunct
     id: userId
   }
 
-  //
+  next();
 }
 

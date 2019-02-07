@@ -58,8 +58,8 @@ setupDb().then(() => {
   }));
 
   const basePath = '/api';
-  app.get(`${basePath}/enterprises`, authorize, require('./get/enterprises').default);
-  app.get(`${basePath}/enterprise/:enterpriseId/bmc/`, authorize, require('./get/bmc').default);
+  app.get(`${basePath}/enterprises`, require('./get/enterprises').default);
+  app.get(`${basePath}/enterprise/:enterpriseId/bmc/`, require('./get/bmc').default);
   app.post(`${basePath}/enterprises`, authorize, formDataHandler.single('logo'), require('./post/enterprises').default);
   app.post(`${basePath}/enterprise/:enterpriseId/member`, authorize, require('./post/member').default);
   app.delete(`${basePath}/enterprise/:enterpriseId/member/:targetEmail`, authorize, require('./delete/member').default);

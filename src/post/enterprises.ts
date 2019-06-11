@@ -42,7 +42,7 @@ export default async (req: AuthRequest, res: Response) => {
   }
 
   let logoFile = req.file;
-  let logoUri: string = logoFile.filename;
+  let logoUri: string = logoFile ? logoFile.filename : '';
 
   let validationError = validate(name, businessIdea);
   if (validationError !== true) {

@@ -10,4 +10,4 @@ export const devPort = 8004;
 export const fqdn = `localhost:${devPort}`;
 export const protocol = `http`;
 export const baseUrl = `${protocol}://${fqdn}`
-export const mediaBaseUrl = `${baseUrl}/media`
+export const mediaBaseUrl = `/media`

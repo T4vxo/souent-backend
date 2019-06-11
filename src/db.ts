@@ -30,6 +30,7 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
       }
 
       if (e) {
+	console.log("SMÄLL I SQL!:", sql);
         //  Error occurred
         return reject(e);
       }
@@ -52,7 +53,6 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
             }
           });
 
-          console.log("Output: ", output);
 
           if (output.length == 1) {
             output = output[0];
